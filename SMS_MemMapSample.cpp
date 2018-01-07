@@ -16,6 +16,8 @@
 #include <conio.h>
 #include <iostream>
 #include <string>
+#include <cmath>
+#include <sstream>
 
 
 
@@ -23,6 +25,23 @@
 
 // Name of the pCars memory mapped file
 #define MAP_OBJECT_NAME "$pcars2$"
+
+float normalize(float val, int max){
+	if (max <= 1 || val == 0.0) return val;
+	float sign = 1;
+	if (val < 0){
+		val = -val;
+		sign = -1;
+	}
+	if (val > max) val = max;
+	return (float)log(val + 1) / log(max) * sign;
+}
+
+std::string Convert(float number) {
+	std::ostringstream buff;
+	buff << number;
+	return buff.str();
+}
 
 int main()
 {
@@ -75,6 +94,8 @@ int main()
 	unsigned int updateIndex(0);
 	unsigned int indexChange(0);
 	printf( "ESC TO EXIT\n\n" );
+	float maxValues[6] = { 1, 1, 1, 1, 1, 1 };
+	float arr1[6];
 	while (true)
 	{
 		if ( sharedData->mSequenceNumber % 2 )
@@ -88,13 +109,20 @@ int main()
 
 		//Copy the whole structure before processing it, otherwise the risk of the game writing into it during processing is too high.
 		memcpy(localCopy,sharedData,sizeof(SharedMemory));
-
-
+		
+		switch (localCopy->mGameState) {
+		case 0:
+			for (int i = 0; i < 6; i++) {
+				maxValues[i] = 1;
+			}
+			break;
+		}
 		if (localCopy->mSequenceNumber != updateIndex )
 		{
 			// More writes had happened during the read. Should be rare, but can happen.
 			continue;
 		}
+		printf("sequence number %d \n",localCopy->mSequenceNumber);
 
 		printf( "mGameState: (%d)\n", localCopy->mGameState );
 		printf( "mSessionState: (%d)\n", localCopy->mSessionState );
@@ -111,10 +139,46 @@ int main()
 		printf("Extents Centre X : %f Y : %f Z : %f \n", localCopy->mExtentsCentre[0], localCopy->mExtentsCentre[1], localCopy->mExtentsCentre[2]);
 
 		//std::string a = std::to_string(localCopy->mOrientation[0])+","+ std::to_string(localCopy->mOrientation[1])+","+ std::to_string(localCopy->mOrientation[2]);
-		
-		
-		std::string input = std::to_string(localCopy->mLocalAcceleration[0]) + "," + std::to_string(localCopy->mLocalAcceleration[1]) + "," + std::to_string(localCopy->mLocalAcceleration[2])+","+std::to_string(localCopy->mAngularVelocity[0]) + "," + std::to_string(localCopy->mAngularVelocity[1]) + "," + std::to_string(localCopy->mAngularVelocity[2])+",\n";
 
+		
+//		arr1[0] = localCopy->mLocalAcceleration[0];
+//		arr1[1] = localCopy->mLocalAcceleration[1];
+//		arr1[2] = localCopy->mLocalAcceleration[2];
+//		arr1[3] = localCopy->mAngularVelocity[0];
+//		arr1[4] = localCopy->mAngularVelocity[1];
+//		arr1[5] = localCopy->mAngularVelocity[2];
+		for (int i = 0; i < 6; i++)
+		{
+			switch (i) {
+				case 0:
+					arr1[i] = localCopy->mLocalAcceleration[0];
+					break;
+				case 1:
+					arr1[i] = localCopy->mLocalAcceleration[1];
+					break;
+				case 2:
+					arr1[i] = localCopy->mLocalAcceleration[2];
+					break;
+				case 3:
+					arr1[i] = localCopy->mAngularVelocity[0];
+					break;
+				case 4:
+					arr1[i] = localCopy->mAngularVelocity[1];
+					break;
+				case 5:
+					arr1[i] = localCopy->mAngularVelocity[2];
+					break;
+			}
+			float f = abs(arr1[i]);
+			if (f > maxValues[i])
+			{
+				maxValues[i] = f;
+			}
+			arr1[i] = normalize(arr1[i], maxValues[i]);
+		}
+		
+		std::string input = std::to_string(localCopy ->mSequenceNumber) +" "+ Convert(arr1[0]) + "," + Convert(arr1[1]) + "," + Convert(arr1[2]) +","+ Convert(arr1[3]) + "," + Convert(arr1[4]) + "," + Convert(arr1[5]) +",\n";
+		
 		sendto(out, input.c_str(), input.size() + 1, 0, (sockaddr*)&server, sizeof(server));
 		
 		
@@ -138,3 +202,7 @@ int main()
 
 	return 0;
 }
+
+
+
+
