@@ -55,7 +55,7 @@ int main()
 
 	sockaddr_in server;
 	server.sin_family = AF_INET;
-	server.sin_port = htons(54000);
+	server.sin_port = htons(10009);
 
 	inet_pton(AF_INET, "127.0.0.1", &server.sin_addr);
 
@@ -86,7 +86,9 @@ int main()
 		printf( "Data version mismatch\n");
 		return 1;
 	}
-
+	std::string inputComm = "command, enable, \n";
+	
+		sendto(out, inputComm.c_str(), inputComm.size() + 1, 0, (sockaddr*)&server, sizeof(server));
 
 	//------------------------------------------------------------------------------
 	// TEST DISPLAY CODE
@@ -177,7 +179,7 @@ int main()
 			arr1[i] = normalize(arr1[i], maxValues[i]);
 		}
 		
-		std::string input = std::to_string(localCopy ->mSequenceNumber) +" "+ Convert(arr1[0]) + "," + Convert(arr1[1]) + "," + Convert(arr1[2]) +","+ Convert(arr1[3]) + "," + Convert(arr1[4]) + "," + Convert(arr1[5]) +",\n";
+		std::string input = "xyzrpy,"+Convert(arr1[0]) + "," + Convert(arr1[1]) + "," + Convert(arr1[2]) +","+ Convert(arr1[3]) + "," + Convert(arr1[4]) + "," + Convert(arr1[5]) +",\n";
 		
 		sendto(out, input.c_str(), input.size() + 1, 0, (sockaddr*)&server, sizeof(server));
 		
