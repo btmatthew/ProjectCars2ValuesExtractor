@@ -140,7 +140,15 @@ int main()
 		printf("World Acceleration X : %f Y : %f Z : %f \n", localCopy->mWorldAcceleration[0], localCopy->mWorldAcceleration[1], localCopy->mWorldAcceleration[2]);
 		printf("Extents Centre X : %f Y : %f Z : %f \n", localCopy->mExtentsCentre[0], localCopy->mExtentsCentre[1], localCopy->mExtentsCentre[2]);
 
+		//std::string a = std::to_string(localCopy->mOrientation[0])+","+ std::to_string(localCopy->mOrientation[1])+","+ std::to_string(localCopy->mOrientation[2]);
+
 		
+//		arr1[0] = localCopy->mLocalAcceleration[0];
+//		arr1[1] = localCopy->mLocalAcceleration[1];
+//		arr1[2] = localCopy->mLocalAcceleration[2];
+//		arr1[3] = localCopy->mAngularVelocity[0];
+//		arr1[4] = localCopy->mAngularVelocity[1];
+//		arr1[5] = localCopy->mAngularVelocity[2];
 		for (int i = 0; i < 6; i++)
 		{
 			switch (i) {
