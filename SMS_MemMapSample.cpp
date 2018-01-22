@@ -145,22 +145,22 @@ int main()
 		{
 			switch (i) {
 				case 0:
-					arr1[i] = localCopy->mLocalVelocity[0];
+					arr1[i] = -localCopy->mLocalAcceleration[1];//sent as x
 					break;
 				case 1:
-					arr1[i] = localCopy->mLocalVelocity[1];
+					arr1[i] = localCopy->mLocalAcceleration[0];//sent as y
 					break;
 				case 2:
-					arr1[i] = localCopy->mLocalVelocity[2];
+					arr1[i] = localCopy->mLocalAcceleration[2];//sent z
 					break;
 				case 3:
-					arr1[i] = localCopy->mAngularVelocity[0];
+					arr1[i] = localCopy->mAngularVelocity[1];//sent as roll
 					break;
 				case 4:
-					arr1[i] = localCopy->mAngularVelocity[1];
+					arr1[i] = localCopy->mAngularVelocity[0];//sent as pitch
 					break;
 				case 5:
-					arr1[i] = localCopy->mAngularVelocity[2];
+					arr1[i] = localCopy->mAngularVelocity[2];//sent as yaw
 					break;
 			}
 			float f = abs(arr1[i]);
