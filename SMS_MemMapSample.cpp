@@ -25,6 +25,7 @@
 
 // Name of the pCars memory mapped file
 #define MAP_OBJECT_NAME "$pcars2$"
+boolean displayInformation = false;
 
 float normalize(float val, int max){
 	if (max <= 1 || val == 0.0) return val;
@@ -37,7 +38,7 @@ float normalize(float val, int max){
 	return (float)log(val + 1) / log(max) * sign;
 }
 
-std::string Convert(float number) {
+std::string convert(float number) {
 	std::ostringstream buff;
 	buff << number;
 	return buff.str();
@@ -86,9 +87,6 @@ int main()
 		printf( "Data version mismatch\n");
 		return 1;
 	}
-//	std::string inputComm = "command, enable, \n";
-	
-	//	sendto(out, inputComm.c_str(), inputComm.size() + 1, 0, (sockaddr*)&server, sizeof(server));
 
 	//------------------------------------------------------------------------------
 	// TEST DISPLAY CODE
@@ -98,6 +96,7 @@ int main()
 	printf( "ESC TO EXIT\n\n" );
 	float maxValues[6] = { 1, 1, 1, 1, 1, 1 };
 	float arr1[6];
+
 	while (true)
 	{
 		if ( sharedData->mSequenceNumber % 2 )
@@ -124,21 +123,8 @@ int main()
 			// More writes had happened during the read. Should be rare, but can happen.
 			continue;
 		}
-		printf("sequence number %d \n",localCopy->mSequenceNumber);
 
-		printf( "mGameState: (%d)\n", localCopy->mGameState );
-		printf( "mSessionState: (%d)\n", localCopy->mSessionState );
-		printf("Speed: %f: \n", localCopy->mSpeed/ 0.44704);
-		printf( "mOdometerKM: (%0.2f)\n", localCopy->mOdometerKM );
 
-		printf("Orientation X : %f Y : %f Z : %f \n", localCopy->mOrientation[0], localCopy->mOrientation[1], localCopy->mOrientation[2]);
-		printf("Local Velocity X : %f Y : %f Z : %f \n",localCopy->mLocalVelocity[0], localCopy->mLocalVelocity[1], localCopy->mLocalVelocity[2]);
-		printf("World Velocity X : %f Y : %f Z : %f \n", localCopy->mWorldVelocity[0], localCopy->mWorldVelocity[1], localCopy->mWorldVelocity[2]);
-
-		printf("Angular Velocity X : %f Y : %f Z : %f \n", localCopy->mAngularVelocity[0], localCopy->mAngularVelocity[1], localCopy->mAngularVelocity[2]);
-		printf("Local Acceleration X : %f Y : %f Z : %f \n", localCopy->mLocalAcceleration[0], localCopy->mLocalAcceleration[1], localCopy->mLocalAcceleration[2]);
-		printf("World Acceleration X : %f Y : %f Z : %f \n", localCopy->mWorldAcceleration[0], localCopy->mWorldAcceleration[1], localCopy->mWorldAcceleration[2]);
-		printf("Extents Centre X : %f Y : %f Z : %f \n", localCopy->mExtentsCentre[0], localCopy->mExtentsCentre[1], localCopy->mExtentsCentre[2]);
 
 		
 		for (int i = 0; i < 6; i++)
@@ -171,17 +157,28 @@ int main()
 			arr1[i] = normalize(arr1[i], maxValues[i]);
 		}
 		
-		std::string input = "xyzrpy,"+Convert(arr1[0]) + "," + Convert(arr1[1]) + "," + Convert(arr1[2]) +","+ Convert(arr1[3]) + "," + Convert(arr1[4]) + "," + Convert(arr1[5]) +",\n";
+		std::string input = "xyzrpy,"+convert(arr1[0]) + "," + convert(arr1[1]) + "," + convert(arr1[2]) +","+ convert(arr1[3]) + "," + convert(arr1[4]) + "," + convert(arr1[5]) +",\n";
 		
 		sendto(out, input.c_str(), input.size() + 1, 0, (sockaddr*)&server, sizeof(server));
-		
-		
-		
-		
-		
 
-		system("cls");
+		if (displayInformation) {
+			system("cls");
+			printf("sequence number %d \n", localCopy->mSequenceNumber);
 
+			printf("mGameState: (%d)\n", localCopy->mGameState);
+			printf("mSessionState: (%d)\n", localCopy->mSessionState);
+			printf("Speed: %f: \n", localCopy->mSpeed / 0.44704);
+			printf("mOdometerKM: (%0.2f)\n", localCopy->mOdometerKM);
+
+			printf("Orientation X : %f Y : %f Z : %f \n", localCopy->mOrientation[0], localCopy->mOrientation[1], localCopy->mOrientation[2]);
+			printf("Local Velocity X : %f Y : %f Z : %f \n", localCopy->mLocalVelocity[0], localCopy->mLocalVelocity[1], localCopy->mLocalVelocity[2]);
+			printf("World Velocity X : %f Y : %f Z : %f \n", localCopy->mWorldVelocity[0], localCopy->mWorldVelocity[1], localCopy->mWorldVelocity[2]);
+
+			printf("Angular Velocity X : %f Y : %f Z : %f \n", localCopy->mAngularVelocity[0], localCopy->mAngularVelocity[1], localCopy->mAngularVelocity[2]);
+			printf("Local Acceleration X : %f Y : %f Z : %f \n", localCopy->mLocalAcceleration[0], localCopy->mLocalAcceleration[1], localCopy->mLocalAcceleration[2]);
+			printf("World Acceleration X : %f Y : %f Z : %f \n", localCopy->mWorldAcceleration[0], localCopy->mWorldAcceleration[1], localCopy->mWorldAcceleration[2]);
+			printf("Extents Centre X : %f Y : %f Z : %f \n", localCopy->mExtentsCentre[0], localCopy->mExtentsCentre[1], localCopy->mExtentsCentre[2]);
+		}
 		if ( _kbhit() && _getch() == 27 ) // check for escape
 		{
 			break;
